@@ -22,7 +22,7 @@ from sklearn.svm import SVC
 from colour import Color
 import json
 
-from Bundle_adjustment_3dmm_fixed_cam import PySBA_3dmm
+from optimize_2D_non_linear import optimize_2D_non_linear
 
 
 folder = "../outBaseline/blender/"
@@ -151,7 +151,7 @@ for person_idx in range(num_people):
         for num, cam in enumerate(cams):
             cam_indices.append(cam)
 
-    ba = PySBA_3dmm(cams_BA, shape_params[person_idx], mean_zooms[person_idx], blendshape_params[indices],
+    ba = optimize_2D_non_linear(cams_BA, shape_params[person_idx], mean_zooms[person_idx], blendshape_params[indices],
                     trans_matsBA[indices], np.array(lmarks_indices), cam_indices, morphablemodel_with_expressions, used_lms_numbers,
                     model_contour_lists, contour_lms, n_shape_params, n_blendshape_params, 66, n_cams_used[indices])
     params = ba.optimize()

@@ -1,7 +1,7 @@
 import numpy as np
 import open3d as o3d
 import matplotlib.pyplot as plt
-from helpers_real import cosineSimilarity
+from helpers_evaluation import cosineSimilarity
 from glob import glob
 from scipy import spatial
 import os
@@ -15,25 +15,18 @@ def read_ground_truth(filename):
     tracks = df.iloc[:, 2:].to_numpy().reshape((750, 6, 3))
     return tracks[1::2,:,:]
 
-model = eos.morphablemodel.load_model("share/sfm_shape_3448.bin")
-blendshapes = eos.morphablemodel.load_blendshapes("share/expression_blendshapes_3448.bin")
+model = eos.morphablemodel.load_model("../implementations/share/sfm_shape_3448.bin")
+blendshapes = eos.morphablemodel.load_blendshapes("../implementations/share/expression_blendshapes_3448.bin")
 # Create a MorphableModel with expressions from the loaded neutral model and blendshapes:
 morphablemodel_with_expressions = eos.morphablemodel.MorphableModel(model.get_shape_model(), blendshapes,
                                                                     color_model=eos.morphablemodel.PcaModel(),
                                                                     vertex_definitions=None,
                                                                     texture_coordinates=model.get_texture_coordinates())
 
-dirName = "/media/jonas/Elements/ViconDataSplit/ViconCombined"
-
-# dirName = "D:/BirdTrackingProject/20180906_1BirdBackpack"
-# sessionName = "TT_JoKö_2020_10_20_14_32_09"
-# sessionName = "20180906_1BirdBackpack_Bird201"
-
-dirName = "/media/jonas/Elements/ViconDataSplit/ViconCombined"
+dirName = "../implementations/outBaseline/vicon/"
 method = ""
-folder_tracking = dirName + "/out_sfm_vicon_lam30/" + method
+folder_tracking = dirName + method
 
-#shapes_baseline = [ [0.625, -1.6, 0.24, -0.15, 0.79], [-0.25, -0.59, -0.037, -0.23, 0.31]]
 bs_prop_all = glob(folder_tracking + 'ble*face*')
 shape_prop = np.loadtxt(folder_tracking + 'shapes.txt')
 trans_prop_0 = glob(folder_tracking + 'tr*face*')
@@ -78,13 +71,8 @@ gt_all = np.ones((3, 375, 6, 3)) * np.nan
 
 for person in range(3):
     ground_truth = read_ground_truth(
-        filename="/media/jonas/Elements/ViconDataSplit/Facetracking VICON Mock up Daten/" + person_gt[person])
+        filename="../ground_truth/vicon_gt/" + person_gt[person])
     #ground_truth = ground_truth[0:75]
-
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(ground_truth[0])
-    o3d.io.write_point_cloud(folder_tracking + 'gt_vertices_face' + str(person) + 'frame' + str(0) + '.ply',
-                             pcd)
     ground_truth[ground_truth == 0] = np.nan
     gt_all[person] = ground_truth
 
@@ -94,21 +82,6 @@ diff_norm_person = np.nanmean(diff_norm, axis=1)
 diff_norm_total = np.nanmean(diff_norm_person)
 print(diff_norm_total)
 
-diff_norm_over_time = np.nanmean(diff_norm, axis=2)
-
-fig, ax = plt.subplots()
-plt.xlim([0, 375])
-ax.plot(np.arange(0,375), diff_norm_over_time[0], label='Person 0')
-ax.plot(np.arange(0,375), diff_norm_over_time[1], label='Person 1')
-#ax.plot(np.arange(0,375), diff_norm_over_time[2], label='Person 2')
-handles, labels = ax.get_legend_handles_labels()
-ax.legend(handles, labels)
-plt.xlabel('Frame numbers', fontsize=18)
-plt.ylabel('Average distance in mm', fontsize=16)
-plt.title('Average error over time', fontsize=20)
-ax.grid()
-fig.savefig("avg_dist_person_base_lam30.png")
-plt.show()
 
 
 

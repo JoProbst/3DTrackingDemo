@@ -6,9 +6,6 @@ import numpy as np
 import os
 import eos
 import cv2
-
-import toml
-
 import transforms3d as t3d
 
 from colour import Color

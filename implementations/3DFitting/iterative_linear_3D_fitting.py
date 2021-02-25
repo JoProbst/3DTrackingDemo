@@ -12,8 +12,8 @@ import json
 import helpers_fitting_3d
 
 
-folder = "../outBaseline/blender/"
-out_folder = "out_iterative_linear_3D/"
+folder = "../outBaseline/vicon/"
+out_folder = "out_iterative_linear_3D_vicon/"
 
 write_images = True
 blends_linear = True
